@@ -1,5 +1,6 @@
 package com.example.myfragmentapp;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -16,23 +17,39 @@ public class DetailFragment extends Fragment {
     private Pokemon[] _pokemon = {new Pokemon("Pikachu", R.drawable.pikachu)
             , new Pokemon("Dragonite", R.drawable.dragonite)
             , new Pokemon("Bulbasaur", R.drawable.bulbasaur)};
+
+    final static String ARG_POKEMON = "pokemon";
+    int mCurrentPokemon = -1;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
+        if (savedInstanceState != null) {
+            mCurrentPokemon = savedInstanceState.getInt(ARG_POKEMON);
+        }
+
         return inflater.inflate(R.layout.detail_fragment, container, false);
     }
 
-    public void setPokemon(String p){
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        Bundle args = getArguments();
+        if(args != null){
+            setPokemon(_pokemon[args.getInt(ARG_POKEMON)]);
+            mCurrentPokemon = args.getInt(ARG_POKEMON);
+        }else if (mCurrentPokemon != -1) {
+            // Set article based on saved instance state defined during onCreateView
+            setPokemon(_pokemon[mCurrentPokemon]);
+        }
+    }
+
+    public void setPokemon(Pokemon p){
         ImageView image = getView().findViewById(R.id.imageView);
         TextView text = getView().findViewById(R.id.textView);
-        int selected = 0;
-        if(p == "Dragonite") {
-            selected = 1;
-        }
-        if(p == "Bulbasaur"){
-            selected = 2;
-        }
-        image.setImageResource(_pokemon[selected].image);
-        text.setText(_pokemon[selected].name);
+
+        image.setImageResource(p.image);
+        text.setText(p.name);
     }
 }
